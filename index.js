@@ -58,6 +58,7 @@ module.exports = function(content) {
 	var nunjucksContext = opt.context;
     var config = opt.configure || {};
     var configureEnvironment = opt.configureEnvironment || function(env) {};
+    var locale = utils.parseQuery(this.resourceQuery);
 
 	var loader = new NunjucksLoader(nunjucksSearchPaths, function (path) {
 		this.addDependency(path);
@@ -67,8 +68,9 @@ module.exports = function(content) {
     
     configureEnvironment(nunjEnv);
 
-	var template = nunjucks.compile(content, nunjEnv);
-	html = template.render(nunjucksContext);
+    var template = nunjucks.compile(content, nunjEnv);
+    
+	html = template.render(locale || nunjucksContext);
 
 	callback(null, html);
 };
