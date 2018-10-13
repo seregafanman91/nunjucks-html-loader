@@ -65,12 +65,14 @@ module.exports = function(content) {
 	}.bind(this));
 
     var nunjEnv = new nunjucks.Environment(loader, config);
+
+    nunjEnv.addGlobal('locale', locale);
     
     configureEnvironment(nunjEnv);
 
     var template = nunjucks.compile(content, nunjEnv);
     
-	html = template.render(locale || nunjucksContext);
+	html = template.render(nunjucksContext);
 
 	callback(null, html);
 };
