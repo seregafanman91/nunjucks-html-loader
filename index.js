@@ -49,25 +49,34 @@ var NunjucksLoader = nunjucks.Loader.extend({
 });
 
 module.exports = function(content) {
-	this.cacheable();
+
+    this.cacheable();
 
 	var callback = this.async();
-	var opt = utils.getOptions(this) || {};
+    var opt = utils.getOptions(this) || {};
 
 	var nunjucksSearchPaths = opt.searchPaths;
-	var nunjucksContext = opt.context;
+    var nunjucksContext = opt.context;
+    var locales = opt.locales;
+    var locale = utils.parseQuery(this.resourceQuery);
+
     var config = opt.configure || {};
     var configureEnvironment = opt.configureEnvironment || function(env) {};
-    var locale = utils.parseQuery(this.resourceQuery);
 
 	var loader = new NunjucksLoader(nunjucksSearchPaths, function (path) {
 		this.addDependency(path);
-	}.bind(this));
+    }.bind(this));
 
     var nunjEnv = new nunjucks.Environment(loader, config);
 
-    nunjEnv.addGlobal('locale', locale);
-    
+    if (locale.locale) {
+        nunjEnv.addGlobal('locale', locale.locale);
+    }
+
+    if (locales) {
+        nunjEnv.addGlobal('locales', locales.localizations);
+    }
+
     configureEnvironment(nunjEnv);
 
     var template = nunjucks.compile(content, nunjEnv);
@@ -76,3 +85,4 @@ module.exports = function(content) {
 
 	callback(null, html);
 };
+
